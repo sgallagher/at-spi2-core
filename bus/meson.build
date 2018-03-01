@@ -43,13 +43,30 @@ else
                              required: true).path()
 endif
 
-executable('at-spi-bus-launcher', 'at-spi-bus-launcher.c',
-           include_directories: [ root_inc, include_directories('.') ],
-           dependencies: [ gio_dep, x11_deps ],
-           c_args: [
+launcher_args = [
              '-DSYSCONFDIR="@0@"'.format(atspi_sysconfdir),
              '-DDATADIR="@0@"'.format(atspi_datadir),
              '-DDBUS_DAEMON="@0@"'.format(dbus_daemon),
-           ],
+           ]
+
+if get_option('dbus_broker') != 'default'
+  launcher_args += '-DDBUS_BROKER="@0@"'.format(get_option('dbus_broker'))
+else
+  dbus_broker = find_program('dbus-broker-launch',
+                             '/sbin/dbus-broker-launch',
+                             '/usr/sbin/dbus-broker-launch',
+                             '/libexec/dbus-broker-launch',
+                             '/usr/libexec/dbus-broker-launch',
+                             '/usr/pkg/bin/dbus-broker-launch',
+                             required: false)
+  if dbus_broker.found()
+    launcher_args += '-DDBUS_BROKER="@0@"'.format(dbus_broker.path())
+  endif
+endif
+
+executable('at-spi-bus-launcher', 'at-spi-bus-launcher.c',
+           include_directories: [ root_inc, include_directories('.') ],
+           dependencies: [ gio_dep, x11_deps ],
+           c_args: launcher_args,
            install: true,
            install_dir: atspi_libexecdir)
