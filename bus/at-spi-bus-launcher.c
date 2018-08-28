@@ -362,7 +362,7 @@ setup_bus_child_broker (gpointer data)
 static gboolean
 ensure_a11y_bus_broker (A11yBusLauncher *app, char *config_path)
 {
-  char *argv[] = { DBUS_BROKER, config_path, "--scope", "user", "--verbose", NULL };
+  char *argv[] = { DBUS_BROKER, config_path, "--scope", "user", NULL };
   struct sockaddr_un addr = { .sun_family = AF_UNIX };
   socklen_t addr_len = sizeof(addr);
   GPid pid;
